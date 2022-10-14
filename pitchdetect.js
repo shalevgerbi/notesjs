@@ -1,291 +1,323 @@
+window.AudioContext = window.AudioContext || window.webkitAudioContext
 
+var audioContext = null
+var isPlaying = false
+var isquarterNoteDisplay = false
+var sourceNode = null
+var analyser = null
+var theBuffer = null
+var DEBUGCANVAS = null
+var mediaStreamSource = null
+var detectorElem,
+  canvasElem,
+  waveCanvas,
+  pitchElem,
+  noteElem,
+  detuneElem,
+  detuneAmount
 
-window.AudioContext = window.AudioContext || window.webkitAudioContext;
+window.onload = function () {
+  audioContext = new AudioContext()
+  MAX_SIZE = Math.max(4, Math.floor(audioContext.sampleRate / 5000)) // corresponds to a 5kHz signal
 
-var audioContext = null;
-var isPlaying = false;
-var sourceNode = null;
-var analyser = null;
-var theBuffer = null;
-var DEBUGCANVAS = null;
-var mediaStreamSource = null;
-var detectorElem, 
-	canvasElem,
-	waveCanvas,
-	pitchElem,
-	noteElem,
-	detuneElem,
-	detuneAmount;
+  detectorElem = document.getElementById('detector')
+  canvasElem = document.getElementById('output')
+  DEBUGCANVAS = document.getElementById('waveform')
+  if (DEBUGCANVAS) {
+    waveCanvas = DEBUGCANVAS.getContext('2d')
+    waveCanvas.strokeStyle = 'black'
+    waveCanvas.lineWidth = 1
+  }
+  pitchElem = document.getElementById('pitch')
+  noteElem = document.getElementById('note')
+  detuneElem = document.getElementById('detune')
+  detuneAmount = document.getElementById('detune_amt')
 
-window.onload = function() {
-	audioContext = new AudioContext();
-	MAX_SIZE = Math.max(4,Math.floor(audioContext.sampleRate/5000));	// corresponds to a 5kHz signal
+  detectorElem.ondragenter = function () {
+    this.classList.add('droptarget')
+    return false
+  }
+  detectorElem.ondragleave = function () {
+    this.classList.remove('droptarget')
+    return false
+  }
+  detectorElem.ondrop = function (e) {
+    this.classList.remove('droptarget')
+    e.preventDefault()
+    theBuffer = null
 
-	detectorElem = document.getElementById( "detector" );
-	canvasElem = document.getElementById( "output" );
-	DEBUGCANVAS = document.getElementById( "waveform" );
-	if (DEBUGCANVAS) {
-		waveCanvas = DEBUGCANVAS.getContext("2d");
-		waveCanvas.strokeStyle = "black";
-		waveCanvas.lineWidth = 1;
-	}
-	pitchElem = document.getElementById( "pitch" );
-	noteElem = document.getElementById( "note" );
-	detuneElem = document.getElementById( "detune" );
-	detuneAmount = document.getElementById( "detune_amt" );
-
-	detectorElem.ondragenter = function () { 
-		this.classList.add("droptarget"); 
-		return false; };
-	detectorElem.ondragleave = function () { this.classList.remove("droptarget"); return false; };
-	detectorElem.ondrop = function (e) {
-  		this.classList.remove("droptarget");
-  		e.preventDefault();
-		theBuffer = null;
-
-	  	var reader = new FileReader();
-	  	reader.onload = function (event) {
-	  		audioContext.decodeAudioData( event.target.result, function(buffer) {
-	    		theBuffer = buffer;
-	  		}, function(){alert("error loading!");} ); 
-
-	  	};
-	  	reader.onerror = function (event) {
-	  		alert("Error: " + reader.error );
-		};
-	  	reader.readAsArrayBuffer(e.dataTransfer.files[0]);
-	  	return false;
-	};
-	
-	fetch('DemoCDEF.wav')
-		.then((response) => {
-			if (!response.ok) {
-				throw new Error(`HTTP error, status = ${response.status}`);
-			}
-			return response.arrayBuffer();
-		}).then((buffer) => audioContext.decodeAudioData(buffer)).then((decodedData) => {
-			theBuffer = decodedData;
-		});
-
-}
-function noteToLocation(note,pitch) {
-    let location = 35;
-    let finalLocation;
-    labels = ['C','D','E','F','G','A','B']
-    labels.map(label =>{
-        if(pitch.includes(label)){
-            finalLocation = location.toFixed();
-        }
-        location +=7
-    })
-    
-    return finalLocation
-}
-function startPitchDetect() {	
-    // grab an audio context
-    audioContext = new AudioContext();
-
-    // Attempt to get audio input
-    navigator.mediaDevices.getUserMedia(
-    {
-        "audio": {
-            "mandatory": {
-                "googEchoCancellation": "false",
-                "googAutoGainControl": "false",
-                "googNoiseSuppression": "false",
-                "googHighpassFilter": "false"
-            },
-            "optional": []
+    var reader = new FileReader()
+    reader.onload = function (event) {
+      audioContext.decodeAudioData(
+        event.target.result,
+        function (buffer) {
+          theBuffer = buffer
         },
-    }).then((stream) => {
-        // Create an AudioNode from the stream.
-        mediaStreamSource = audioContext.createMediaStreamSource(stream);
+        function () {
+          alert('error loading!')
+        },
+      )
+    }
+    reader.onerror = function (event) {
+      alert('Error: ' + reader.error)
+    }
+    reader.readAsArrayBuffer(e.dataTransfer.files[0])
+    return false
+  }
 
-	    // Connect it to the destination.
-	    analyser = audioContext.createAnalyser();
-	    analyser.fftSize = 2048;
-	    mediaStreamSource.connect( analyser );
-	    updatePitch();
-    }).catch((err) => {
-        // always check for errors at the end.
-        console.error(`${err.name}: ${err.message}`);
-        alert('Stream generation failed.');
-    });
+  fetch('DemoCDEF.wav')
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error, status = ${response.status}`)
+      }
+      return response.arrayBuffer()
+    })
+    .then((buffer) => audioContext.decodeAudioData(buffer))
+    .then((decodedData) => {
+      theBuffer = decodedData
+    })
+}
+function noteToLocation(note, pitch) {
+  let location = 30
+  let finalLocation
+  labels = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
+  labels.map((label) => {
+    if (pitch.includes(label)) {
+      finalLocation = location.toFixed()
+    }
+    location += 5
+  })
+
+  return finalLocation
+}
+function startPitchDetect() {
+  // grab an audio context
+  audioContext = new AudioContext()
+
+  // Attempt to get audio input
+  navigator.mediaDevices
+    .getUserMedia({
+      audio: {
+        mandatory: {
+          googEchoCancellation: 'false',
+          googAutoGainControl: 'false',
+          googNoiseSuppression: 'false',
+          googHighpassFilter: 'false',
+        },
+        optional: [],
+      },
+    })
+    .then((stream) => {
+      // Create an AudioNode from the stream.
+      mediaStreamSource = audioContext.createMediaStreamSource(stream)
+
+      // Connect it to the destination.
+      analyser = audioContext.createAnalyser()
+      analyser.fftSize = 2048
+      mediaStreamSource.connect(analyser)
+      updatePitch()
+    })
+    .catch((err) => {
+      // always check for errors at the end.
+      console.error(`${err.name}: ${err.message}`)
+      alert('Stream generation failed.')
+    })
 }
 
 function toggleOscillator() {
-    if (isPlaying) {
-        //stop playing and return
-        sourceNode.stop( 0 );
-        sourceNode = null;
-        analyser = null;
-        isPlaying = false;
-		if (!window.cancelAnimationFrame)
-			window.cancelAnimationFrame = window.webkitCancelAnimationFrame;
-        window.cancelAnimationFrame( rafID );
-        return "play oscillator";
-    }
-    sourceNode = audioContext.createOscillator();
+  if (isPlaying) {
+    //stop playing and return
+    sourceNode.stop(0)
+    sourceNode = null
+    analyser = null
+    isPlaying = false
+    if (!window.cancelAnimationFrame)
+      window.cancelAnimationFrame = window.webkitCancelAnimationFrame
+    window.cancelAnimationFrame(rafID)
+    return 'play oscillator'
+  }
+  sourceNode = audioContext.createOscillator()
 
-    analyser = audioContext.createAnalyser();
-    analyser.fftSize = 2048;
-    sourceNode.connect( analyser );
-    analyser.connect( audioContext.destination );
-    sourceNode.start(0);
-    isPlaying = true;
-    isLiveInput = false;
-    updatePitch();
+  analyser = audioContext.createAnalyser()
+  analyser.fftSize = 2048
+  sourceNode.connect(analyser)
+  analyser.connect(audioContext.destination)
+  sourceNode.start(0)
+  isPlaying = true
+  isLiveInput = false
+  updatePitch()
 
-    return "stop";
+  return 'stop'
 }
 
 function toggleLiveInput() {
-    if (isPlaying) {
-        //stop playing and return
-        sourceNode.stop( 0 );
-        sourceNode = null;
-        analyser = null;
-        isPlaying = false;
-		if (!window.cancelAnimationFrame)
-			window.cancelAnimationFrame = window.webkitCancelAnimationFrame;
-        window.cancelAnimationFrame( rafID );
-    }
-    getUserMedia(
-    	{
-            "audio": {
-                "mandatory": {
-                    "googEchoCancellation": "false",
-                    "googAutoGainControl": "false",
-                    "googNoiseSuppression": "false",
-                    "googHighpassFilter": "false"
-                },
-                "optional": []
-            },
-        }, gotStream);
+  if (isPlaying) {
+    //stop playing and return
+    sourceNode.stop(0)
+    sourceNode = null
+    analyser = null
+    isPlaying = false
+    if (!window.cancelAnimationFrame)
+      window.cancelAnimationFrame = window.webkitCancelAnimationFrame
+    window.cancelAnimationFrame(rafID)
+  }
+  getUserMedia(
+    {
+      audio: {
+        mandatory: {
+          googEchoCancellation: 'false',
+          googAutoGainControl: 'false',
+          googNoiseSuppression: 'false',
+          googHighpassFilter: 'false',
+        },
+        optional: [],
+      },
+    },
+    gotStream,
+  )
 }
 const notesArr = []
 const pitchArr = []
 function togglePlayback() {
-    if (isPlaying) {
-        //stop playing and return
-        sourceNode.stop( 0 );
-        sourceNode = null;
-        analyser = null;
-        isPlaying = false;
-		if (!window.cancelAnimationFrame)
-			window.cancelAnimationFrame = window.webkitCancelAnimationFrame;
-        window.cancelAnimationFrame( rafID );
-        let distance = 50;
-        const isFlatArr = []
-        notesArr.map(note => {
-            isFlatArr.push(note.toString().includes('#') ? 'sharp' : false);
-            
-        })
-        pitchArr.map((note,i) => {
-            // const isFlat = note.toString().includes('#') ? 'sharp' : false;
-            const GDiv = document.getElementById("GClef");
-            let quarter = document.createElement("img")
-            let sharp = null;
-            console.log(isFlatArr[i])
-            distance += 50
-            if (isFlatArr[i] === 'sharp'){
-                sharp = document.createElement("img")   
-                sharp.src = './Sharp.svg'
-                sharp.style.bottom= note+15+"px";
-                sharp.style.position= "relative";
-                sharp.style.zIndex= -1;
-                sharp.style.left= distance+"px";
-                sharp.style.height = '30px'
-                GDiv.appendChild(sharp);
-            }
-            quarter.src = "./quarterNote.svg";
-            
-            quarter.style.bottom= noteToLocation(note,notesArr[i])+"px";
-            quarter.style.position= "relative";
-            quarter.style.zIndex= -1;
-            quarter.style.left= distance+"px";
-            // console.log(isFlat);
+  if (isPlaying) {
+    //stop playing and return
+    sourceNode.stop(0)
+    sourceNode = null
+    analyser = null
+    isPlaying = false
+    if (!window.cancelAnimationFrame)
+      window.cancelAnimationFrame = window.webkitCancelAnimationFrame
+    window.cancelAnimationFrame(rafID)
+    let distance = 50
+    const isFlatArr = []
+    notesArr.map((note) => {
+      isFlatArr.push(note.toString().includes('#') ? 'sharp' : false)
+    })
+    pitchArr.map((note, i) => {
+      console.log('note',note.toString())
+      // const isFlat = note.toString().includes('#') ? 'sharp' : false;
+      //const GDiv = document.getElementById('GClef')
+      const divQuarter = document.getElementById('containerQuarterNoteGC')
+      let quarter = document.createElement('img')
+      let sharp = null
+      console.log(isFlatArr[i])
+      console.log('note',note.toString())
+      console.log('distance',distance)
+      if (isFlatArr[i] === 'sharp') {
+        sharp = document.createElement('img')
+        sharp.src = './Sharp.svg'
+        sharp.style.bottom = note + 5 + 'px'
+        sharp.style.position = 'absolute'
+        // sharp.style.zIndex = -1
+        sharp.style.left = distance + 'px'
+        sharp.style.height = '30px'
+        divQuarter.appendChild(sharp)
+      }
+      quarter.src = './quarterNote.svg'
+      quarter.style.bottom = noteToLocation(note, notesArr[i]) + 'px'
+      quarter.style.position = 'absolute'
+      // quarter.style.zIndex = -1
+      quarter.style.left = distance + 'px'
+      distance += 50
+      divQuarter.appendChild(quarter)
+    })
+    console.log('notesarr',notesArr)
+    console.log('picarr',pitchArr)
+    return 'start'
+  }
+  sourceNode = audioContext.createBufferSource()
+  console.log('so', sourceNode)
+  sourceNode.buffer = theBuffer
+  console.log('buff', sourceNode.buffer)
+  sourceNode.loop = true
 
-            GDiv.appendChild(quarter);
+  analyser = audioContext.createAnalyser()
+  analyser.fftSize = 1024
+  sourceNode.connect(analyser)
+  analyser.connect(audioContext.destination)
+  sourceNode.start(0)
+  isPlaying = true
+  isLiveInput = false
+  updatePitch()
 
-            
-        })
-        console.log(notesArr)
-        console.log(pitchArr)
-        return "start";
-    }
-
-    sourceNode = audioContext.createBufferSource();
-    sourceNode.buffer = theBuffer;
-    sourceNode.loop = true;
-
-    analyser = audioContext.createAnalyser();
-    analyser.fftSize = 1024;
-    sourceNode.connect( analyser );
-    analyser.connect( audioContext.destination );
-    sourceNode.start( 0 );
-    isPlaying = true;
-    isLiveInput = false;
-    updatePitch();
-    
-    return "stop";
+  return 'stop'
 }
 
-var rafID = null;
-var tracks = null;
-var buflen = 2048;
-var buf = new Float32Array( buflen );
+function clear() {
+  console.log('clear')
+  return document.getElementById('deafult_page')
+}
 
-var noteStrings = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+var rafID = null
+var tracks = null
+var buflen = 2048
+var buf = new Float32Array(buflen)
+
+var noteStrings = [
+  'C',
+  'C#',
+  'D',
+  'D#',
+  'E',
+  'F',
+  'F#',
+  'G',
+  'G#',
+  'A',
+  'A#',
+  'B',
+]
 var octave = {
-    0: {
-        start: 16.35,
-        end: 31
-    },
-    1:{
-        start: 31.1,
-        end: 63
-    },
-    2:{
-        start: 63.1,
-        end: 125
-    },
-    3:{
-        start: 125.1,
-        end: 247
-    },
-    4:{
-        start: 247.1,
-        end: 495
-    },
-    5:{
-        start: 495.1,
-        end: 990
-    },
-    6:{
-        start: 990.1,
-        end: 1976
-    },
-    7:{
-        start: 1976.1,
-        end: 3952
-    },
-    8:{
-        start: 3952.1,
-        end: 7902.13
-    }
+  0: {
+    start: 16.35,
+    end: 31,
+  },
+  1: {
+    start: 31.1,
+    end: 63,
+  },
+  2: {
+    start: 63.1,
+    end: 125,
+  },
+  3: {
+    start: 125.1,
+    end: 247,
+  },
+  4: {
+    start: 247.1,
+    end: 495,
+  },
+  5: {
+    start: 495.1,
+    end: 990,
+  },
+  6: {
+    start: 990.1,
+    end: 1976,
+  },
+  7: {
+    start: 1976.1,
+    end: 3952,
+  },
+  8: {
+    start: 3952.1,
+    end: 7902.13,
+  },
 }
-function noteFromPitch( frequency ) {
-	var noteNum = 12 * (Math.log( frequency / 440 )/Math.log(2) );
-	return Math.round( noteNum ) + 69;
-}
-
-function frequencyFromNoteNumber( note ) {
-	return 440 * Math.pow(2,(note-69)/12);
+function noteFromPitch(frequency) {
+  var noteNum = 12 * (Math.log(frequency / 440) / Math.log(2))
+  return Math.round(noteNum) + 69
 }
 
-function centsOffFromPitch( frequency, note ) {
-	return Math.floor( 1200 * Math.log( frequency / frequencyFromNoteNumber( note ))/Math.log(2) );
+function frequencyFromNoteNumber(note) {
+  return 440 * Math.pow(2, (note - 69) / 12)
+}
+
+function centsOffFromPitch(frequency, note) {
+  return Math.floor(
+    (1200 * Math.log(frequency / frequencyFromNoteNumber(note))) / Math.log(2),
+  )
 }
 
 // this is the previously used pitch detection algorithm.
@@ -349,114 +381,127 @@ function autoCorrelate( buf, sampleRate ) {
 }
 */
 
-function autoCorrelate( buf, sampleRate ) {
-	// Implements the ACF2+ algorithm
-	var SIZE = buf.length;
-	var rms = 0;
+function autoCorrelate(buf, sampleRate) {
+  // Implements the ACF2+ algorithm
+  var SIZE = buf.length
+  var rms = 0
 
-	for (var i=0;i<SIZE;i++) {
-		var val = buf[i];
-		rms += val*val;
-	}
-	rms = Math.sqrt(rms/SIZE);
-	if (rms<0.01) // not enough signal
-		return -1;
+  for (var i = 0; i < SIZE; i++) {
+    var val = buf[i]
+    rms += val * val
+  }
+  rms = Math.sqrt(rms / SIZE)
+  if (rms < 0.01)
+    // not enough signal
+    return -1
 
-	var r1=0, r2=SIZE-1, thres=0.2;
-	for (var i=0; i<SIZE/2; i++)
-		if (Math.abs(buf[i])<thres) { r1=i; break; }
-	for (var i=1; i<SIZE/2; i++)
-		if (Math.abs(buf[SIZE-i])<thres) { r2=SIZE-i; break; }
+  var r1 = 0,
+    r2 = SIZE - 1,
+    thres = 0.2
+  for (var i = 0; i < SIZE / 2; i++)
+    if (Math.abs(buf[i]) < thres) {
+      r1 = i
+      break
+    }
+  for (var i = 1; i < SIZE / 2; i++)
+    if (Math.abs(buf[SIZE - i]) < thres) {
+      r2 = SIZE - i
+      break
+    }
 
-	buf = buf.slice(r1,r2);
-	SIZE = buf.length;
+  buf = buf.slice(r1, r2)
+  SIZE = buf.length
 
-	var c = new Array(SIZE).fill(0);
-	for (var i=0; i<SIZE; i++)
-		for (var j=0; j<SIZE-i; j++)
-			c[i] = c[i] + buf[j]*buf[j+i];
+  var c = new Array(SIZE).fill(0)
+  for (var i = 0; i < SIZE; i++)
+    for (var j = 0; j < SIZE - i; j++) c[i] = c[i] + buf[j] * buf[j + i]
 
-	var d=0; while (c[d]>c[d+1]) d++;
-	var maxval=-1, maxpos=-1;
-	for (var i=d; i<SIZE; i++) {
-		if (c[i] > maxval) {
-			maxval = c[i];
-			maxpos = i;
-		}
-	}
-	var T0 = maxpos;
+  var d = 0
+  while (c[d] > c[d + 1]) d++
+  var maxval = -1,
+    maxpos = -1
+  for (var i = d; i < SIZE; i++) {
+    if (c[i] > maxval) {
+      maxval = c[i]
+      maxpos = i
+    }
+  }
+  var T0 = maxpos
 
-	var x1=c[T0-1], x2=c[T0], x3=c[T0+1];
-	a = (x1 + x3 - 2*x2)/2;
-	b = (x3 - x1)/2;
-	if (a) T0 = T0 - b/(2*a);
+  var x1 = c[T0 - 1],
+    x2 = c[T0],
+    x3 = c[T0 + 1]
+  a = (x1 + x3 - 2 * x2) / 2
+  b = (x3 - x1) / 2
+  if (a) T0 = T0 - b / (2 * a)
 
-	return sampleRate/T0;
+  return sampleRate / T0
 }
 
-function updatePitch( time ) {
-	var cycles = new Array;
-	analyser.getFloatTimeDomainData( buf );
-	var ac = autoCorrelate( buf, audioContext.sampleRate );
-	// TODO: Paint confidence meter on canvasElem here.
+function updatePitch(time) {
+  var cycles = new Array()
+  analyser.getFloatTimeDomainData(buf)
+  var ac = autoCorrelate(buf, audioContext.sampleRate)
+  // TODO: Paint confidence meter on canvasElem here.
 
-	if (DEBUGCANVAS) {  // This draws the current waveform, useful for debugging
-		waveCanvas.clearRect(0,0,512,256);
-		waveCanvas.strokeStyle = "red";
-		waveCanvas.beginPath();
-		waveCanvas.moveTo(0,0);
-		waveCanvas.lineTo(0,256);
-		waveCanvas.moveTo(128,0);
-		waveCanvas.lineTo(128,256);
-		waveCanvas.moveTo(256,0);
-		waveCanvas.lineTo(256,256);
-		waveCanvas.moveTo(384,0);
-		waveCanvas.lineTo(384,256);
-		waveCanvas.moveTo(512,0);
-		waveCanvas.lineTo(512,256);
-		waveCanvas.stroke();
-		waveCanvas.strokeStyle = "black";
-		waveCanvas.beginPath();
-		waveCanvas.moveTo(0,buf[0]);
-		for (var i=1;i<512;i++) {
-			waveCanvas.lineTo(i,128+(buf[i]*128));
-		}
-		waveCanvas.stroke();
-	}
+  if (DEBUGCANVAS) {
+    // This draws the current waveform, useful for debugging
+    waveCanvas.clearRect(0, 0, 512, 256)
+    waveCanvas.strokeStyle = 'red'
+    waveCanvas.beginPath()
+    waveCanvas.moveTo(0, 0)
+    waveCanvas.lineTo(0, 256)
+    waveCanvas.moveTo(128, 0)
+    waveCanvas.lineTo(128, 256)
+    waveCanvas.moveTo(256, 0)
+    waveCanvas.lineTo(256, 256)
+    waveCanvas.moveTo(384, 0)
+    waveCanvas.lineTo(384, 256)
+    waveCanvas.moveTo(512, 0)
+    waveCanvas.lineTo(512, 256)
+    waveCanvas.stroke()
+    waveCanvas.strokeStyle = 'black'
+    waveCanvas.beginPath()
+    waveCanvas.moveTo(0, buf[0])
+    for (var i = 1; i < 512; i++) {
+      waveCanvas.lineTo(i, 128 + buf[i] * 128)
+    }
+    waveCanvas.stroke()
+  }
 
- 	if (ac == -1) {
- 		detectorElem.className = "vague";
-	 	pitchElem.innerText = "--";
-		noteElem.innerText = "-";
-		detuneElem.className = "";
-		detuneAmount.innerText = "--";
- 	} else {
-	 	detectorElem.className = "confident";
-	 	pitch = ac;
-	 	pitchElem.innerText = Math.round( pitch ) ;
-	 	var note =  noteFromPitch( pitch );
-        
-        pitchArr[pitchArr.length-1] === note ? null : pitchArr.push(note)
-		let noteOctave = Math.floor(note/12)-1
-        noteElem.innerHTML = noteStrings[note%12]+noteOctave;
-        
-        notesArr[notesArr.length-1] === noteStrings[note%12] ? null : notesArr.push(noteStrings[note%12])
-		
-        console.log(noteOctave)
-        var detune = centsOffFromPitch( pitch, note );
-		if (detune == 0 ) {
-			detuneElem.className = "";
-			detuneAmount.innerHTML = "--";
-		} else {
-			if (detune < 0)
-				detuneElem.className = "flat";
-			else
-				detuneElem.className = "sharp";
-			detuneAmount.innerHTML = Math.abs( detune );
-		}
-	}
+  if (ac == -1) {
+    detectorElem.className = 'vague'
+    pitchElem.innerText = '--'
+    noteElem.innerText = '-'
+    detuneElem.className = ''
+    detuneAmount.innerText = '--'
+  } else {
+    detectorElem.className = 'confident'
+    pitch = ac
+    pitchElem.innerText = Math.round(pitch)
+    var note = noteFromPitch(pitch)
 
-	if (!window.requestAnimationFrame)
-		window.requestAnimationFrame = window.webkitRequestAnimationFrame;
-	rafID = window.requestAnimationFrame( updatePitch );
+    pitchArr[pitchArr.length - 1] === note ? null : pitchArr.push(note)
+    let noteOctave = Math.floor(note / 12) - 1
+    noteElem.innerHTML = noteStrings[note % 12] + noteOctave
+
+    notesArr[notesArr.length - 1] === noteStrings[note % 12]
+      ? null
+      : notesArr.push(noteStrings[note % 12])
+
+    console.log(noteOctave)
+    var detune = centsOffFromPitch(pitch, note)
+    if (detune == 0) {
+      detuneElem.className = ''
+      detuneAmount.innerHTML = '--'
+    } else {
+      if (detune < 0) detuneElem.className = 'flat'
+      else detuneElem.className = 'sharp'
+      detuneAmount.innerHTML = Math.abs(detune)
+    }
+  }
+
+  if (!window.requestAnimationFrame)
+    window.requestAnimationFrame = window.webkitRequestAnimationFrame
+  rafID = window.requestAnimationFrame(updatePitch)
 }

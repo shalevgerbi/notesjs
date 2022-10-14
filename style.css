@@ -1,0 +1,123 @@
+body {
+  font: 9pt 'Alike', sans-serif;
+}
+#note {
+  font-size: 164px;
+}
+.droptarget {
+  background-color: #348781;
+}
+div.confident {
+  color: black;
+}
+div.vague {
+  color: black; 
+}
+
+.notes-container{
+    margin-top:200px;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+}
+
+.lines-container {
+    position:relative;
+    display:flex;
+    flex-direction: column;
+    justify-content: center;    
+    margin: 20px;
+}
+
+
+
+#note {
+  display: inline-block;
+  height: 180px;
+  text-align: left;
+}
+
+#detector {
+  width: 300px;
+  height: 300px;
+  border: 4px solid rgb(218, 3, 3);
+  border-radius: 8px;
+  text-align: center;
+  padding-top: 10px;
+}
+#output {
+  width: 300px;
+  height: 42px;
+}
+#flat {
+  display: none;
+}
+#sharp {
+  display: none;
+}
+.flat #flat {
+  display: inline;
+}
+.sharp #sharp {
+  display: inline;
+}
+ #GClefsvg {
+  position: absolute;
+  bottom: 25px;
+} 
+#FClefsvg{
+    position: absolute;
+    bottom: 30px;
+}
+
+#notesPrint {
+    display: inline;
+    align-items: 'space-between';
+    margin: 15px;
+}
+
+/* line {
+  position: fixed;
+  top: 0;
+  left: 0;
+} */
+.parent {
+  position: relative;
+  top: 0;
+  left: 0;
+}
+.child {
+  top: 10px;
+  left: 15px;
+}
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  margin:50px;
+}
+.btn {
+  margin: 5px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  letter-spacing: 2px;
+  text-decoration: none;
+  text-transform: uppercase;
+  color: #000;
+  cursor: pointer;
+  border: 3px solid;
+  padding: 0.25em 0.5em;
+  box-shadow: 1px 1px 0px 0px, 2px 2px 0px 0px, 3px 3px 0px 0px, 4px 4px 0px 0px,
+    5px 5px 0px 0px;
+  position: relative;
+  touch-action: manipulation;
+}
+.btn:active {
+  box-shadow: 0px 0px 0px 0px;
+  top: 5px;
+  left: 5px;
+}
+canvas {
+  margin: 15px;
+}
