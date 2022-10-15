@@ -68,7 +68,7 @@ div.vague {
 } 
 #FClefsvg{
     position: absolute;
-    bottom: auto;
+    bottom: -7px;
 }
 
 #notesPrint {
