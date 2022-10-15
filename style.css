@@ -93,10 +93,15 @@ div.vague {
 }
 .center {
   display: flex;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
   text-align: center;
   margin:50px;
+}
+.gridItem {
+ display: grid;
+ grid-template-columns: auto auto;
 }
 /* .btn {
   margin: 5px;
