@@ -65,7 +65,7 @@ window.onload = function () {
     return false
   }
 
-  fetch('DemoCDEF.wav')
+  fetch('Demo.wav')
     .then((response) => {
       if (!response.ok) {
         throw new Error(`HTTP error, status = ${response.status}`)
@@ -78,7 +78,7 @@ window.onload = function () {
     })
 }
 function noteToLocation(note, pitch) {
-  let location = 30
+  let location = -7
   let finalLocation
   labels = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
   labels.map((label) => {
@@ -206,10 +206,10 @@ function togglePlayback() {
       if (isFlatArr[i] === 'sharp') {
         sharp = document.createElement('img')
         sharp.src = './Sharp.svg'
-        sharp.style.bottom = note + 5 + 'px'
+        sharp.style.bottom = noteToLocation(note, notesArr[i]) -7 + 'px'
         sharp.style.position = 'absolute'
         // sharp.style.zIndex = -1
-        sharp.style.left = distance + 'px'
+        sharp.style.left = distance - 10 + 'px'
         sharp.style.height = '30px'
         divQuarter.appendChild(sharp)
       }
@@ -437,7 +437,8 @@ function autoCorrelate(buf, sampleRate) {
 
   return sampleRate / T0
 }
-
+let sampleCounter = 0;
+let prevNote;
 function updatePitch(time) {
   var cycles = new Array()
   analyser.getFloatTimeDomainData(buf)
@@ -481,14 +482,21 @@ function updatePitch(time) {
     pitchElem.innerText = Math.round(pitch)
     var note = noteFromPitch(pitch)
 
-    pitchArr[pitchArr.length - 1] === note ? null : pitchArr.push(note)
+    // pitchArr[pitchArr.length - 1] === note ? null : pitchArr.push(note)
     let noteOctave = Math.floor(note / 12) - 1
     noteElem.innerHTML = noteStrings[note % 12] + noteOctave
-
-    notesArr[notesArr.length - 1] === noteStrings[note % 12]
-      ? null
-      : notesArr.push(noteStrings[note % 12])
-
+    if (prevNote == noteStrings[note % 12] && sampleCounter < 3 || notesArr == [])
+		sampleCounter++
+    else{
+		if (sampleCounter >= 3 && notesArr[notesArr.length - 1] !== prevNote){
+			notesArr.push(noteStrings[note % 12])
+			pitchArr.push(note)
+			sampleCounter=0;
+		} 
+		else 
+		sampleCounter++;
+	}
+	prevNote = noteStrings[note % 12]
     console.log(noteOctave)
     var detune = centsOffFromPitch(pitch, note)
     if (detune == 0) {
