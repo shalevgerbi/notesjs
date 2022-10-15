@@ -485,10 +485,10 @@ function updatePitch(time) {
     // pitchArr[pitchArr.length - 1] === note ? null : pitchArr.push(note)
     let noteOctave = Math.floor(note / 12) - 1
     noteElem.innerHTML = noteStrings[note % 12] + noteOctave
-    if (prevNote == noteStrings[note % 12] && sampleCounter < 3 || notesArr == [])
+    if (prevNote == noteStrings[note % 12] && sampleCounter < 10 || notesArr == [])
 		sampleCounter++
     else{
-		if (sampleCounter >= 3 && notesArr[notesArr.length - 1] !== prevNote){
+		if (sampleCounter >= 10 && notesArr[notesArr.length - 1] !== prevNote){
 			notesArr.push(noteStrings[note % 12])
 			pitchArr.push(note)
 			sampleCounter=0;
