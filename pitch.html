@@ -11,6 +11,7 @@
   </head>
   <body id="deafult_page">
     <script src="pitchdetect.js"></script>
+	<div class="gridItem">
     <div class="center">
       <div id="detector" class="vague">
         <!--HZ-->
@@ -27,17 +28,20 @@
         </div>
       </div>
     </div>
-    <div class="center">
-      <div>
-        <button onclick="startPitchDetect();">Start</button>
-        <button onclick="this.innerText = togglePlayback()">use demo audio</button>
-        <button onclick="toggleLiveInput()">use live input</button>
-        <button onclick="toggleOscillator()">use oscillator</button>
-      </div>
-    </div>
+	
+    
     <div class="center">
       <canvas id="waveform" width="512" height="256"></canvas>
     </div>
+	<div class="center">
+		<div>
+		  <button onclick="startPitchDetect();">Start</button>
+		  <button onclick="this.innerText = togglePlayback()">use demo audio</button>
+		  <button onclick="toggleLiveInput()">use live input</button>
+		  <button onclick="toggleOscillator()">use oscillator</button>
+		</div>
+	  </div>
+</div>
     <div class="center">
       <div class="notes-container">
         <div class="lines-container">
