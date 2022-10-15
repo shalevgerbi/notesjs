@@ -29,14 +29,10 @@
     </div>
     <div class="center">
       <div>
-          <button class="btn" onclick="this.innerText = togglePlayback()">
-            use upload audio
-          </button>
-      </div>
-      <div>
-          <button class="btn" onclick="clear()">
-            clear
-          </button>
+        <button onclick="startPitchDetect();">Start</button>
+        <button onclick="this.innerText = togglePlayback()">use demo audio</button>
+        <button onclick="toggleLiveInput()">use live input</button>
+        <button onclick="toggleOscillator()">use oscillator</button>
       </div>
     </div>
     <div class="center">
@@ -51,7 +47,7 @@
           <img class="line" src="./VerticalLine.svg" alt="Vertical Line" />
           <img class="line" src="./VerticalLine.svg" alt="Vertical Line" />
           <img class="line" src="./VerticalLine.svg" alt="Vertical Line" />
-		  <img class="line" src="./VerticalLine.svg" alt="Vertical Line" />
+          <img class="line" src="./VerticalLine.svg" alt="Vertical Line" />
           <div id="containerQuarterNoteGC"></div>
         </div>
         <div id="FClef" class="lines-container">
@@ -61,7 +57,7 @@
           <img class="line" src="./VerticalLine.svg" alt="Vertical Line" />
           <img class="line" src="./VerticalLine.svg" alt="Vertical Line" />
           <img class="line" src="./VerticalLine.svg" alt="Vertical Line" />
-		  <img class="line" src="./VerticalLine.svg" alt="Vertical Line" />
+          <img class="line" src="./VerticalLine.svg" alt="Vertical Line" />
         </div>
       </div>
     </div>

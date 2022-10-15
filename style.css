@@ -63,11 +63,11 @@ div.vague {
 }
  #GClefsvg {
   position: absolute;
-  bottom: 25px;
+  bottom: auto;
 } 
 #FClefsvg{
     position: absolute;
-    bottom: 30px;
+    bottom: auto;
 }
 
 #notesPrint {
@@ -97,7 +97,7 @@ div.vague {
   text-align: center;
   margin:50px;
 }
-.btn {
+/* .btn {
   margin: 5px;
   font-family: 'Open Sans', sans-serif;
   font-size: 16px;
@@ -117,7 +117,7 @@ div.vague {
   box-shadow: 0px 0px 0px 0px;
   top: 5px;
   left: 5px;
-}
+} */
 canvas {
   margin: 15px;
 }
