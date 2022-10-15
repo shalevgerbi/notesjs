@@ -65,7 +65,7 @@ window.onload = function () {
     return false
   }
 
-  fetch('Demo.wav')
+  fetch('DemoCDEF.wav')
     .then((response) => {
       if (!response.ok) {
         throw new Error(`HTTP error, status = ${response.status}`)
