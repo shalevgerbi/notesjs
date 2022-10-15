@@ -19,6 +19,7 @@ div.vague {
     position: absolute;
     display: flex;
     flex-direction: column;
+    left: 0;
 }
 
 .lines-container {
