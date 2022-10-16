@@ -213,7 +213,7 @@ function togglePlayback() {
         sharp.style.height = '30px'
         divQuarter.appendChild(sharp)
       }
-      quarter.src = './quarterNote.svg'
+      quarter.src = notesArr[i].includes('C') ? './Cnote.svg' : './quarterNote.svg'
       quarter.style.bottom = noteToLocation(note, notesArr[i]) + 'px'
       quarter.style.position = 'absolute'
       // quarter.style.zIndex = -1
