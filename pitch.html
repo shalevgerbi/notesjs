@@ -10,7 +10,10 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body id="deafult_page">
-    <script src="pitchdetect.js"></script>
+	  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+	  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
+	  <script src="./node_modules/music-tempo/dist/browser/music-tempo.js"></script>
+	  <script src="pitchdetect.js"></script>
 	<div class="gridItem">
     <div class="center">
       <div id="detector" class="vague">
@@ -45,21 +48,23 @@
     <div class="center">
       <div class="notes-container">
         <div class="lines-container">
-          <img id="GClefsvg" src="./G-clef.svg" alt="GClef" />
-          <img class="line" src="./VerticalLine.svg" alt="Vertical Line" />
-          <img class="line" src="./VerticalLine.svg" alt="Vertical Line" />
-          <img class="line" src="./VerticalLine.svg" alt="Vertical Line" />
-          <img class="line" src="./VerticalLine.svg" alt="Vertical Line" />
-          <img class="line" src="./VerticalLine.svg" alt="Vertical Line" />
-          <div id="containerQuarterNoteGC"></div>
+          <img id="GClefsvg" src="./img/staff/G-clef.svg" alt="GClef" />
+          <img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
+          <img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
+          <img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
+          <img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
+          <img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
+          <div id="containerQuarterNoteGC">
+            
+		      </div>
         </div>
         <div id="FClef" class="lines-container">
-          <img id="FClefsvg" src="./FClef.svg" alt="FClef" />
-          <img class="line" src="./VerticalLine.svg" alt="Vertical Line" />
-          <img class="line" src="./VerticalLine.svg" alt="Vertical Line" />
-          <img class="line" src="./VerticalLine.svg" alt="Vertical Line" />
-          <img class="line" src="./VerticalLine.svg" alt="Vertical Line" />
-          <img class="line" src="./VerticalLine.svg" alt="Vertical Line" />
+          <img id="FClefsvg" src="./img/staff/FClef.svg" alt="FClef" />
+          <img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
+          <img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
+          <img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
+          <img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
+          <img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
           
         </div>
       </div>
