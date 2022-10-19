@@ -19,6 +19,8 @@ var detectorElem,
 var MAX_SIZE;
 var lastItem;
 var soundPath = './audio/littleY.wav'
+let barFlag=0;
+
 window.onload = function () {
   audioContext = new AudioContext()
   sampleRate = audioContext.sampleRate;
@@ -146,14 +148,15 @@ function startPitchDetect() {
     })
 }
 function getRhythm(index) {
-
-  console.log(howManyArr[index])
-  if (index == 0)
+  if (20 < howManyArr[index] && howManyArr[index] < 30){
+    barFlag++;
     return 'quarter/';
-  else if (20 < howManyArr[index] && howManyArr[index] < 30)
-    return 'quarter/';
-  else
+  }
+  else{
+    barFlag+=2
     return 'half/';
+  }
+    
 
   // setTimeout(() => {let duration = index !== songBeats ? (Math.abs(songBeats[index] - songBeats[index+1])) : null},50)
   // console.log('duration',duration)
@@ -172,10 +175,12 @@ function isRotate(note,octave){
   }
   return res
 }
+let rhytmArr=[]
 function pickSvg(note, octave, index) {
   console.log('octave', octave)
   let rotate = isRotate(note,octave)
   let rhytm = getRhythm(index)
+  rhytmArr.push(rhytm)
   let path = './img/notes/'+rhytm;
   if (!rotate) {
     if (note.includes('C') && octave == 4) {
@@ -240,6 +245,8 @@ function toggleLiveInput() {
     gotStream,
   )
 }
+
+
 const notesArr = []
 const pitchArr = []
 const octaveArr = []
@@ -293,6 +300,23 @@ function togglePlayback() {
       quarter.style.left = distance + 'px'
       distance += 50
       divQuarter.appendChild(quarter)
+      if(barFlag >= 4){
+        let upperBar = document.createElement('img')
+        let lowerBar = document.createElement('img')
+        upperBar.src = './img/staff/barLine.svg'
+        lowerBar.src = './img/staff/barLine.svg'
+        upperBar.style.position = 'absolute'
+        lowerBar.style.position = 'absolute'
+        upperBar.style.bottom = '9px'
+        lowerBar.style.bottom = '-80px'
+
+        upperBar.style.left = distance + 'px'
+        lowerBar.style.left = distance + 'px'
+        distance += 50
+        divQuarter.appendChild(upperBar)
+        divQuarter.appendChild(lowerBar)
+        barFlag = 0
+      }
     })
     sampleCounter = 0
     console.log('notesarr', notesArr)
@@ -560,7 +584,7 @@ function updatePitch(time) {
           // && 
           sampleCounter > 10
           ) {
-        console.log("insida ac =-1")
+        console.log("inside ac =-1")
         notesArr.push(prevNote);
         pitchArr.push(prevPitch)
         octaveArr.push(prevNoteOctave)
