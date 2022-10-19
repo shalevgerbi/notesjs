@@ -64,11 +64,11 @@ div.vague {
 }
  #GClefsvg {
   position: absolute;
-  bottom: auto;
+  bottom: -10px;
 } 
 #FClefsvg{
     position: absolute;
-    bottom: -7px;
+    bottom: 11.5px;
 }
 
 #notesPrint {
