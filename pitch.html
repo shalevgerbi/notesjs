@@ -8,6 +8,7 @@
       type="text/css"
     />
     <link rel="stylesheet" href="./style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"> </script>
   </head>
   <body id="deafult_page">
 	  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
@@ -38,7 +39,7 @@
     </div>
 	<div class="center">
 		<div>
-		  <button onclick="startPitchDetect();">Start</button>
+		  <button id="live" onclick="this.innerText = startPitchDetect();">Start</button>
 		  <button onclick="this.innerText = togglePlayback()">use demo audio</button>
 		  <button onclick="toggleLiveInput()">use live input</button>
 		  <button onclick="toggleOscillator()">use oscillator</button>
