@@ -62,11 +62,11 @@ div.vague {
 .sharp #sharp {
   display: inline;
 }
- #GClefsvg {
+ .GClefsvg {
   position: absolute;
   bottom: -10px;
 } 
-#FClefsvg{
+.FClefsvg{
     position: absolute;
     bottom: 11.5px;
 }
