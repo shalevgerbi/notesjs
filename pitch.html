@@ -14,6 +14,7 @@
 	  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
 	  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
 	  <script src="./node_modules/music-tempo/dist/browser/music-tempo.js"></script>
+    <script src="server.js" defer> </script>
 	  <script src="pitchdetect.js"></script>
 	<div class="gridItem">
     <div class="center">
@@ -68,6 +69,8 @@
           <img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
           
         </div>
+        <input type='file' accept='image/*' onchange='openFile(event)'><br>
+          <img id='outputimg' style="height:149px; width:833px;">
       </div>
     </div>
   </body>
