@@ -16,8 +16,8 @@ var detectorElem,
   noteElem,
   detuneElem,
   detuneAmount
-var MAX_SIZE;
-var lastItem;
+var MAX_SIZE
+var lastItem
 var soundPath = './audio/littleY.wav'
 let barFlag=0;
 let model;
@@ -40,6 +40,9 @@ var buf = new Float32Array(buflen)
 var mt;
 var songTempo;
 var songBeats;
+
+var amountContainerQuarter = 1
+var currentContainerQuarter = null
 
 var noteStrings = [
   'C',
@@ -93,11 +96,9 @@ var octave = {
     end: 7902.13,
   },
 }
-
-
 window.onload = function () {
   audioContext = new AudioContext()
-  sampleRate = audioContext.sampleRate;
+  sampleRate = audioContext.sampleRate
   MAX_SIZE = Math.max(4, Math.floor(audioContext.sampleRate / 5000)) // corresponds to a 5kHz signal
   
   detectorElem = document.getElementById('detector')
@@ -184,15 +185,12 @@ function noteToLocation(note, pitch,octave) {
   let start=-7;
   if(rotate && octave == 3){
     start = -101
-  }
-  else if(!rotate && octave == 4){
+  } else if (!rotate && octave == 4) {
     start = -7
-  }
-  else if(rotate && octave == 4){
+  } else if (rotate && octave == 4) {
     start = -7
-  }
-  else if(!rotate && octave == 3){
-    start =-71
+  } else if (!rotate && octave == 3) {
+    start = -71
   }
 
   let location = start
@@ -260,45 +258,40 @@ function startPitchDetect() {
 }
 
 function getRhythm(index) {
-  if (20 < howManyArr[index] && howManyArr[index] < 30){
-    barFlag++;
-    return 'quarter/';
-  }
-  else{
-    barFlag+=2
-    return 'half/';
+  if (20 < howManyArr[index] && howManyArr[index] < 30) {
+    barFlag++
+    return 'quarter/'
+  } else {
+    barFlag += 2
+    return 'half/'
   }
 }
-
 function isRotate(note,octave){
   const regular4 = ['C','D','E','F','G','A']
   const regular3 = 'C'
-  let res=true;
-  if(octave == 4){
-    regular4.map(label => {
-      if(note.includes(label)) res=false;
+  let res = true
+  if (octave == 4) {
+    regular4.map((label) => {
+      if (note.includes(label)) res = false
     })
-  }
-  else if(octave == 3){
-      if(note.includes(regular3)) return false;   
+  } else if (octave == 3) {
+    if (note.includes(regular3)) return false
   }
   return res
 }
-
 function pickSvg(note, octave, index) {
   console.log('octave', octave)
-  let rotate = isRotate(note,octave)
+  let rotate = isRotate(note, octave)
   let rhytm = getRhythm(index)
   rhytmArr.push(rhytm)
-  let path = './img/notes/'+rhytm;
+  let path = './img/notes/' + rhytm
   if (!rotate) {
     if (note.includes('C') && octave == 4) {
       
       return path + 'lineNote.svg'
     }
-      return path + 'note.svg'
-    }
-  else {
+    return path + 'note.svg'
+  } else {
     return path + 'note_Rotate.svg'
   }
 }
@@ -356,45 +349,52 @@ function toggleLiveInput() {
   )
 }
 
-function buildNotes(){
-  let distance = 50
+// var BPMDetector = require('./bpmDetector.js')
+function buildNotes() {
+    console.log('buildNotes')
+    if (currentContainerQuarter === null) {
+      currentContainerQuarter = document.getElementById('containerQuarter0')
+    }
+    let distance = 50
     const isFlatArr = []
+    let quarterLeftSize=[]
+    let quarter, sharp, upperBar, lowerBar
     notesArr.map((note) => {
+      console.log('note', note)
       isFlatArr.push(note.toString().includes('#') ? 'sharp' : false)
     })
     pitchArr.map((note, i) => {
-      // console.log('note',note.toString())
-      // const isFlat = note.toString().includes('#') ? 'sharp' : false;
-      //const GDiv = document.getElementById('GClef')
-      const divQuarter = document.getElementById('containerQuarterNoteGC')
-      let quarter = document.createElement('img')
-      let sharp = null
-      // console.log(isFlatArr[i])
-      // console.log('note',note.toString())
-      // console.log('distance',distance)
-      let rotate = isRotate(notesArr[i],octaveArr[i])
+      quarter = document.createElement('img')
+      let rotate = isRotate(notesArr[i], octaveArr[i])
       if (isFlatArr[i] === 'sharp') {
         sharp = document.createElement('img')
         sharp.src = './img/flags/Sharp.svg'
-        let bottomPos = Number(noteToLocation(note, notesArr[i],octaveArr[i]));
-        !rotate ? bottomPos-= 8 : bottomPos +=20;
-        sharp.style.bottom= bottomPos + 'px'
+        let bottomPos = Number(noteToLocation(note, notesArr[i], octaveArr[i]))
+        !rotate ? (bottomPos -= 8) : (bottomPos += 20)
+        sharp.style.bottom = bottomPos + 'px'
         sharp.style.position = 'absolute'
-        // sharp.style.zIndex = -1
         sharp.style.left = distance - 10 + 'px'
         sharp.style.height = '30px'
-        divQuarter.appendChild(sharp)
+        if(parseInt(sharp.style.left)>1100){
+          quarterLeftSize.push(sharp)
+        }else{
+        currentContainerQuarter.appendChild(sharp)
+        }
       }
       quarter.src = pickSvg(notesArr[i], octaveArr[i], i)
-      quarter.style.bottom = noteToLocation(note, notesArr[i],octaveArr[i]) + 'px'
+      quarter.style.bottom =
+        noteToLocation(note, notesArr[i], octaveArr[i]) + 'px'
       quarter.style.position = 'absolute'
-      // quarter.style.zIndex = -1
       quarter.style.left = distance + 'px'
+      if(parseInt(quarter.style.left)>1100){
+        quarterLeftSize.push(quarter)
+      }else{
+      currentContainerQuarter.appendChild(quarter)
+      }
       distance += 50
-      divQuarter.appendChild(quarter)
-      if(barFlag >= 4){
-        let upperBar = document.createElement('img')
-        let lowerBar = document.createElement('img')
+      if (barFlag >= 4) {
+        upperBar = document.createElement('img')
+        lowerBar = document.createElement('img')
         upperBar.src = './img/staff/barLine.svg'
         lowerBar.src = './img/staff/barLine.svg'
         upperBar.style.position = 'absolute'
@@ -404,16 +404,25 @@ function buildNotes(){
 
         upperBar.style.left = distance + 'px'
         lowerBar.style.left = distance + 'px'
+        if(parseInt(lowerBar.style.left)>1100 || parseInt(upperBar.style.left)>1100){
+          quarterLeftSize.push(lowerBar)
+          quarterLeftSize.push(upperBar)
+        }else{
+        currentContainerQuarter.appendChild(lowerBar)
+        currentContainerQuarter.appendChild(upperBar)
+        }
         distance += 50
-        divQuarter.appendChild(upperBar)
-        divQuarter.appendChild(lowerBar)
         barFlag = 0
       }
     })
+    console.log('quarterLeftSize',quarterLeftSize)
+    if(quarterLeftSize.length !=0 )
+    {
+      addMusicSheet(quarterLeftSize)
+    }
     sampleCounter = 0
     howMany=0
-
-}
+  }
 
 function togglePlayback() {
   if (isPlaying) {
@@ -438,19 +447,109 @@ function togglePlayback() {
   console.log('so', sourceNode)
   sourceNode.buffer = theBuffer
   console.log('buff', sourceNode.buffer)
-  sourceNode.loop = true
+  sourceNode.loop = false
 
   analyser = audioContext.createAnalyser()
   analyser.fftSize = 1024
   sourceNode.connect(analyser)
   analyser.connect(audioContext.destination)
+  console.log('audioContext.destination',audioContext.destination)
   sourceNode.start(0)
   isPlaying = true
   lastItem = false
   isLiveInput = false
   updatePitch()
-
+  // let audioEnd=true //for now for the notes wont be on each other
+  // if(audioEnd){
+  //   notesArr=[]
+  //   pitchArr=[]
+  // }
   return 'stop'
+}
+function createLineImgs() {
+  imgs = []
+  for (var i = 0; i < 5; i++) {
+    img = document.createElement('img')
+    img.src = './img/staff/VerticalLine.svg'
+    img.alt = 'Vertical Line'
+    imgs.push(img)
+  }
+  return imgs
+}
+let marginTop = 250
+let paddingTop = 50
+function addMusicSheet(muiscNoteAppend) {
+    imgArray = createLineImgs()
+    root = document.getElementById('root')
+    divCenter = document.createElement('div')
+    divCenter.className = 'center'
+    divCenter.style.marginTop = '180px'
+    divNotesContainer = document.createElement('div')
+    divNotesContainer.className = 'notes-container'
+    divLinesContainer = document.createElement('div')
+    divLinesContainer.className = 'lines-container'
+    divLinesContainer.style.marginTop = '50px'
+    divLinesContainer.style.marginBottom = '20px'
+    gClef = document.createElement('img')
+    gClef.className = 'GClefsvg'
+    gClef.src = './img/staff/G-clef.svg'
+    gClef.alt = 'GClef'
+    divContainerQuarter = document.createElement('div')
+    divContainerQuarter.id = 'containerQuarter' + amountContainerQuarter
+    amountContainerQuarter++
+    divLinesContainerSecondly = document.createElement('div')
+    divLinesContainerSecondly.className = 'lines-container'
+    divLinesContainerSecondly.style.marginTop = '20px'
+    divLinesContainerSecondly.style.marginBottom = '50px'
+    fClef = document.createElement('img')
+    fClef.className = 'FClefsvg'
+    fClef.src = './img/staff/FClef.svg'
+    fClef.alt = 'FClef'
+
+    root.appendChild(divCenter)
+    divCenter.appendChild(divNotesContainer)
+    divNotesContainer.appendChild(divLinesContainer)
+
+    divLinesContainer.appendChild(gClef)
+    for (let i = 0; i < 5; i++) {
+      //TODO : the foreach below doesn't work properly'
+      img = document.createElement('img')
+      img.className = 'line'
+      img.src = './img/staff/VerticalLine.svg'
+      img.alt = 'Vertical Line'
+      divLinesContainer.appendChild(img)
+    }
+    divLinesContainer.appendChild(divContainerQuarter)
+    // imgArray.forEach((item)=>{
+    //   divLinesContainer.appendChild(item);
+    // });
+
+    divNotesContainer.appendChild(divLinesContainerSecondly)
+    divLinesContainerSecondly.appendChild(fClef)
+    imgArray.forEach((item) => {
+      divLinesContainerSecondly.appendChild(item)
+    }) 
+    currentContainerQuarter=divContainerQuarter
+    appdedNotes(muiscNoteAppend)
+}
+let distance = 50
+function appdedNotes(muiscNoteAppend) {
+  muiscNoteAppend.forEach((item) => {
+    if (item.src.includes("sharp")) {
+      item.style.left = distance - 10 + 'px'
+      currentContainerQuarter.appendChild(item)
+    }
+    if(item.src.includes("quarter") || item.src.includes("half")) {
+      item.style.left = distance + 'px'
+      distance += 50
+      currentContainerQuarter.appendChild(item)
+    }
+    if (item.src.includes("barLine")) {
+      item.style.left = distance + 'px'
+      distance += 50
+      currentContainerQuarter.appendChild(item)
+    }
+  })
 }
 
 function clear() {
@@ -563,7 +662,6 @@ function updatePitch(time) {
   // console.log('howMany',howMany)
   if (ac == -1) {
     setTimeout(() => {
-
       if (
         // prevNote != null
         //  && noteElem.innerText !== '-'
@@ -602,7 +700,7 @@ function updatePitch(time) {
     pitch = ac
     pitchElem.innerText = Math.round(pitch)
     var note = noteFromPitch(pitch)
-    
+
     let noteOctave = Math.floor(note / 12) - 1
     noteElem.innerHTML = noteStrings[note % 12] + noteOctave
 
@@ -621,9 +719,9 @@ function updatePitch(time) {
     }
     // else{
     // sampleCounter++;
-  // }
-    prevPitch = note;
-    prevNoteOctave = noteOctave;
+    // }
+    prevPitch = note
+    prevNoteOctave = noteOctave
     prevNote = noteStrings[note % 12]
     
     // console.log(noteOctave)
@@ -632,8 +730,7 @@ function updatePitch(time) {
     if (detune == 0) {
       detuneElem.className = ''
       detuneAmount.innerHTML = '--'
-    }
-    else {
+    } else {
       if (detune < 0) detuneElem.className = 'flat'
       else detuneElem.className = 'sharp'
       detuneAmount.innerHTML = Math.abs(detune)
@@ -651,18 +748,23 @@ function getTheBPM() {
   let demoSound = loadSound(soundPath);
   let phrase = new p5.Phrase('phrase',)
   navigator.requestMediaKeySystemAccess
+
 }
 
 function prepare(buffer) {
-  var offlineContext = new OfflineAudioContext(1, buffer.length, buffer.sampleRate);
-  var source = offlineContext.createBufferSource();
-  source.buffer = buffer;
-  var filter = offlineContext.createBiquadFilter();
-  filter.type = "lowpass";
-  source.connect(filter);
-  filter.connect(offlineContext.destination);
-  source.start(0);
-  offlineContext.startRendering();
+  var offlineContext = new OfflineAudioContext(
+    1,
+    buffer.length,
+    buffer.sampleRate,
+  )
+  var source = offlineContext.createBufferSource()
+  source.buffer = buffer
+  var filter = offlineContext.createBiquadFilter()
+  filter.type = 'lowpass'
+  source.connect(filter)
+  filter.connect(offlineContext.destination)
+  source.start(0)
+  offlineContext.startRendering()
   offlineContext.oncomplete = function (e) {
     process(e);
   };
@@ -670,35 +772,35 @@ function prepare(buffer) {
 
 function process(e) {
   // console.log("enter process",e)
-  var filteredBuffer = e.renderedBuffer;
+  var filteredBuffer = e.renderedBuffer
   //If you want to analyze both channels, use the other channel later
-  var data = filteredBuffer.getChannelData(0);
-  mt = new MusicTempo(data);
+  var data = filteredBuffer.getChannelData(0)
+  mt = new MusicTempo(data)
   songTempo = mt.tempo
   songBeats = mt.beats
-  while (mt.tempo < 70) mt.tempo *= 2;
-  while (mt.tempo > 140) mt.tempo /= 2;
+  while (mt.tempo < 70) mt.tempo *= 2
+  while (mt.tempo > 140) mt.tempo /= 2
   console.log('tempo', mt.tempo)
   console.log('beats', mt.beats)
-  var max = arrayMax(data);
-  var min = arrayMin(data);
-  var threshold = min + (max - min) * 0.80;
+  var max = arrayMax(data)
+  var min = arrayMin(data)
+  var threshold = min + (max - min) * 0.8
   threshold = 0.01
   console.log('threshold', threshold)
-  var peaks = getPeaksAtThreshold(data, threshold);
-  var intervalCounts = countIntervalsBetweenNearbyPeaks(peaks);
+  var peaks = getPeaksAtThreshold(data, threshold)
+  var intervalCounts = countIntervalsBetweenNearbyPeaks(peaks)
   console.log(intervalCounts)
-  var tempoCounts = groupNeighborsByTempo(intervalCounts);
-  console.log(tempoCounts);
+  var tempoCounts = groupNeighborsByTempo(intervalCounts)
+  console.log(tempoCounts)
   tempoCounts.sort(function (a, b) {
-    return b.count - a.count;
-  });
+    return b.count - a.count
+  })
   let sum = 0
-  tempoCounts.map(tempo => sum += tempo.tempo)
+  tempoCounts.map((tempo) => (sum += tempo.tempo))
   let mean = sum / tempoCounts.length
   console.log(mean)
   if (tempoCounts.length) {
-    console.log(tempoCounts[0].tempo);
+    console.log(tempoCounts[0].tempo)
     //   output.innerHTML = tempoCounts[0].tempo;
   }
 }
@@ -706,90 +808,92 @@ function process(e) {
 // http://tech.beatport.com/2014/web-audio/beat-detection-using-web-audio/
 function getPeaksAtThreshold(data, threshold) {
   // console.log(`enter getPeaksAtThreshold data:${data} threshold:${threshold}`);
-  var peaksArray = [];
-  var length = data.length;
-  for (var i = 0; i < length;) {
+  var peaksArray = []
+  var length = data.length
+  for (var i = 0; i < length; ) {
     if (data[i] > threshold) {
-      peaksArray.push(i);
+      peaksArray.push(i)
       // Skip forward ~ 1/4s to get past this peak.
-      i += 10000;
+      i += 10000
     }
-    i++;
+    i++
   }
-  return peaksArray;
+  return peaksArray
 }
 
 function countIntervalsBetweenNearbyPeaks(peaks) {
   // console.log(`enter countIntervalsBetweenNearbyPeaks peaks: ${peaks}`)
-  var intervalCounts = [];
+  var intervalCounts = []
   peaks.forEach(function (peak, index) {
     for (var i = 0; i < 10; i++) {
-      var interval = peaks[index + i] - peak;
+      var interval = peaks[index + i] - peak
       var foundInterval = intervalCounts.some(function (intervalCount) {
-        if (intervalCount.interval === interval) return intervalCount.count++;
-      });
+        if (intervalCount.interval === interval) return intervalCount.count++
+      })
       //Additional checks to avoid infinite loops in later processing
       if (!isNaN(interval) && interval !== 0 && !foundInterval) {
         intervalCounts.push({
           interval: interval,
-          count: 1
-        });
+          count: 1,
+        })
       }
     }
-  });
-  return intervalCounts;
+  })
+  return intervalCounts
 }
 
 function groupNeighborsByTempo(intervalCounts) {
   // console.log(`enter groupNeighborsByTempo intervalCounts: ${intervalCounts}`)
-  var tempoCounts = [];
+  var tempoCounts = []
   intervalCounts.forEach(function (intervalCount) {
     //Convert an interval to tempo
-    var theoreticalTempo = 60 / (intervalCount.interval / sampleRate);
-    theoreticalTempo = Math.round(theoreticalTempo);
+    var theoreticalTempo = 60 / (intervalCount.interval / sampleRate)
+    theoreticalTempo = Math.round(theoreticalTempo)
 
     if (theoreticalTempo === 0) {
-      return;
+      return
     }
     // Adjust the tempo to fit within the 90-180 BPM range
-    while (theoreticalTempo < 70) theoreticalTempo *= 2;
-    while (theoreticalTempo > 140) theoreticalTempo /= 2;
+    while (theoreticalTempo < 70) theoreticalTempo *= 2
+    while (theoreticalTempo > 140) theoreticalTempo /= 2
 
     var foundTempo = tempoCounts.some(function (tempoCount) {
       if (tempoCount.tempo === theoreticalTempo)
-        return tempoCount.count += intervalCount.count;
-    });
-    if (!foundTempo && theoreticalTempo < Number(mt.tempo) + 10 && theoreticalTempo > Number(mt.tempo) - 10) {
+        return (tempoCount.count += intervalCount.count)
+    })
+    if (
+      !foundTempo &&
+      theoreticalTempo < Number(mt.tempo) + 10 &&
+      theoreticalTempo > Number(mt.tempo) - 10
+    ) {
       tempoCounts.push({
         tempo: theoreticalTempo,
-        count: intervalCount.count
-      });
+        count: intervalCount.count,
+      })
     }
-  });
-  return tempoCounts;
+  })
+  return tempoCounts
 }
 
 // http://stackoverflow.com/questions/1669190/javascript-min-max-array-values
 function arrayMin(arr) {
   var len = arr.length,
-    min = Infinity;
+    min = Infinity
   while (len--) {
     if (arr[len] < min) {
-      min = arr[len];
+      min = arr[len]
     }
   }
-  return min;
+  return min
 }
 
 function arrayMax(arr) {
   var len = arr.length,
-    max = -Infinity;
+    max = -Infinity
   while (len--) {
     if (arr[len] > max) {
-      max = arr[len];
+      max = arr[len]
     }
   }
   return max;
 }
-
-// ============================================ //

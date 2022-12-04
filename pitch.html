@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="./style.css" />
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"> </script>
   </head>
-  <body id="deafult_page">
+  <body id="root">
 	  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
 	  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
     <!-- <script type='text/javascript' src='./node_modules/tone/build/Tone.js'></script> -->
@@ -55,7 +55,7 @@
     <div class="center">
       <div class="notes-container">
         <div class="lines-container">
-          <img id="GClefsvg" src="./img/staff/G-clef.svg" alt="GClef" />
+          <img class="GClefsvg" src="./img/staff/G-clef.svg" alt="GClef" />
           <img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
           <img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
           <img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
@@ -64,8 +64,8 @@
           <div id="containerQuarterNoteGC">
 		      </div>
         </div>
-        <div id="FClef" class="lines-container">
-          <img id="FClefsvg" src="./img/staff/FClef.svg" alt="FClef" />
+        <div class="lines-container">
+          <img class="FClefsvg" src="./img/staff/FClef.svg" alt="FClef" />
           <img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
           <img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
           <img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
