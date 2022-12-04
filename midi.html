@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+	<script type='text/javascript' src='./node_modules/tone/build/Tone.js'></script>
+	<script src="./midi.js" defer></script>
+</body>
+<button onclick="playMidi()">play</button>
+<img id='outputimg' style="height:149px; width:833px;">
+<div class="center">
+	<div class="notes-container">
+	  <div class="lines-container">
+		<img id="GClefsvg" src="./img/staff/G-clef.svg" alt="GClef" />
+		<img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
+		<img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
+		<img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
+		<img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
+		<img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
+		<div id="containerQuarterNoteGC">
+		</div>
+	  </div>
+	  <div id="FClef" class="lines-container">
+		<img id="FClefsvg" src="./img/staff/FClef.svg" alt="FClef" />
+		<img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
+		<img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
+		<img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
+		<img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
+		<img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
+	  </div>
+	</div>
+  </div>
+</html>

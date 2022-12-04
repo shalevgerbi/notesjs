@@ -13,9 +13,14 @@
   <body id="root">
 	  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
 	  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
+    <!-- <script type='text/javascript' src='./node_modules/tone/build/Tone.js'></script> -->
 	  <script src="./node_modules/music-tempo/dist/browser/music-tempo.js"></script>
     <script src="server.js" defer> </script>
+    <!-- <script src="../node_modules/midi-writer-js" defer></script> -->
+    <!-- <script src="midi.js" type="module"></script> -->
 	  <script src="pitchdetect.js"></script>
+	  <!-- <script src="midi.js"></script> -->
+    <!-- <button onclick="playMidi()">Hello</button> -->
 	<div class="gridItem">
     <div class="center">
       <div id="detector" class="vague">
@@ -39,7 +44,7 @@
       <canvas id="waveform" width="512" height="256"></canvas>
     </div>
 	<div class="center">
-		<div>
+		<div id="buttons">
 		  <button id="live" onclick="this.innerText = startPitchDetect();">Start</button>
 		  <button onclick="this.innerText = togglePlayback()">use demo audio</button>
 		  <button onclick="toggleLiveInput()">use live input</button>
@@ -56,8 +61,7 @@
           <img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
           <img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
           <img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
-          <div id="containerQuarter0">
-            
+          <div id="containerQuarterNoteGC">
 		      </div>
         </div>
         <div class="lines-container">
@@ -67,6 +71,7 @@
           <img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
           <img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
           <img class="line" src="./img/staff/VerticalLine.svg" alt="Vertical Line" />
+          
           
         </div>
         <input type='file' accept='image/*' onchange='openFile(event)'><br>
