@@ -99,9 +99,8 @@ window.onload = function () {
   audioContext = new AudioContext()
   sampleRate = audioContext.sampleRate;
   MAX_SIZE = Math.max(4, Math.floor(audioContext.sampleRate / 5000)) // corresponds to a 5kHz signal
-
+  
   detectorElem = document.getElementById('detector')
-  canvasElem = document.getElementById('output')
   DEBUGCANVAS = document.getElementById('waveform')
   
   if (DEBUGCANVAS) {
@@ -160,7 +159,9 @@ window.onload = function () {
       }
       return response.arrayBuffer()
     })
-    .then((buffer) => audioContext.decodeAudioData(buffer))
+    .then((buffer) => audioContext.decodeAudioData(buffer)
+    
+    )
     .then((decodedData) => {
       theBuffer = decodedData
     })
@@ -172,7 +173,7 @@ window.onload = function () {
 async function loadModel(){
   // tf.serilization.registerClass(CTCLayer);
   // model = tf.keras.models.load_model('my_model.h5', custom_objects={'CTClayer': CTCLayer})
-  model = await tf.loadLayersModel('./model/modeljs/model.json');
+  // model = await tf.loadLayersModel('./model/modeljs/model.json');
   console.log("model loaded")
 }
 
@@ -292,7 +293,7 @@ function pickSvg(note, octave, index) {
   let path = './img/notes/'+rhytm;
   if (!rotate) {
     if (note.includes('C') && octave == 4) {
-
+      
       return path + 'lineNote.svg'
     }
       return path + 'note.svg'
@@ -489,12 +490,12 @@ function autoCorrelate(buf, sampleRate) {
   var r1 = 0,
     r2 = SIZE - 1,
     thres = 0.2
-  for (var i = 0; i < SIZE / 2; i++)
+  for (i = 0; i < SIZE / 2; i++)
     if (Math.abs(buf[i]) < thres) {
       r1 = i
       break
     }
-  for (var i = 1; i < SIZE / 2; i++)
+  for (i = 1; i < SIZE / 2; i++)
     if (Math.abs(buf[SIZE - i]) < thres) {
       r2 = SIZE - i
       break
@@ -504,14 +505,14 @@ function autoCorrelate(buf, sampleRate) {
   SIZE = buf.length
 
   var c = new Array(SIZE).fill(0)
-  for (var i = 0; i < SIZE; i++)
+  for (i = 0; i < SIZE; i++)
     for (var j = 0; j < SIZE - i; j++) c[i] = c[i] + buf[j] * buf[j + i]
 
   var d = 0
   while (c[d] > c[d + 1]) d++
   var maxval = -1,
     maxpos = -1
-  for (var i = d; i < SIZE; i++) {
+  for (i = d; i < SIZE; i++) {
     if (c[i] > maxval) {
       maxval = c[i]
       maxpos = i
@@ -533,7 +534,6 @@ function updatePitch(time) {
   var cycles = new Array()
   analyser.getFloatTimeDomainData(buf)
   var ac = autoCorrelate(buf, audioContext.sampleRate)
-  // TODO: Paint confidence meter on canvasElem here.
 
   if (DEBUGCANVAS) {
     // This draws the current waveform, useful for debugging
@@ -650,7 +650,7 @@ function updatePitch(time) {
 function getTheBPM() {
   let demoSound = loadSound(soundPath);
   let phrase = new p5.Phrase('phrase',)
-
+  navigator.requestMediaKeySystemAccess
 }
 
 function prepare(buffer) {
