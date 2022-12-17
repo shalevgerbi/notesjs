@@ -9,6 +9,7 @@
     />
     <link rel="stylesheet" href="./style.css" />
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"> </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   </head>
   <body id="root">
 	  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
@@ -21,6 +22,20 @@
 	  <script src="pitchdetect.js"></script>
 	  <!-- <script src="midi.js"></script> -->
     <!-- <button onclick="playMidi()">Hello</button> -->
+
+    <div class="tempo-controls">
+          <button id="play-button" class="" onclick="togglePlay()">
+            <i id='icon-play-pause'class="fa fa-play"></i>
+          </button>
+        <button class="tempo-change" data-change="-1">-</button>
+
+        <div class="tempo-container">
+            <div id="tempo">120</div>
+            <div class="bpm">bpm</div>
+        </div>
+
+        <button class="tempo-change" data-change="+1">+</button>
+    </div>
 	<div class="gridItem">
     <div class="center">
       <div id="detector" class="vague">
