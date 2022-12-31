@@ -704,14 +704,14 @@ function updatePitch(time) {
     let noteOctave = Math.floor(note / 12) - 1
     noteElem.innerHTML = noteStrings[note % 12] + noteOctave
 
-    // if(prevNote !== noteStrings[note % 12] && sampleCounter > 20 && prevNoteOctave > 1 && prevNoteOctave < 6 ) {
-    //   console.log("insida if")
-    //   notesArr.push(prevNote);
-    //   pitchArr.push(prevPitch)
-    //   octaveArr.push(prevNoteOctave)
-    //   sampleCounters.push(sampleCounter)
-    //   howManyArr.push(howMany)
-    // }
+    if(prevNote !== noteStrings[note % 12] && sampleCounter > 20 && prevNoteOctave > 1 && prevNoteOctave < 6 ) {
+      console.log("insida if")
+      notesArr.push(prevNote);
+      pitchArr.push(prevPitch)
+      octaveArr.push(prevNoteOctave)
+      sampleCounters.push(sampleCounter)
+      howManyArr.push(howMany)
+    }
       
     if (prevNote == noteStrings[note % 12] && noteOctave > 1 && noteOctave < 6){ //|| notesArr == [] ){
       sampleCounter++
