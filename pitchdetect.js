@@ -96,6 +96,7 @@ var octave = {
     end: 7902.13,
   },
 }
+
 window.onload = function () {
   audioContext = new AudioContext()
   sampleRate = audioContext.sampleRate
@@ -207,8 +208,24 @@ function noteToLocation(note, pitch,octave) {
 
   return finalLocation
 }
-
+let index = 0;
+var notesLength = localStorage.getItem('notesLength') ? Number(localStorage.getItem('notesLength')) : null
 function startPitchDetect() {
+ 
+  for(let i=0;i<onlyNotes.length;i++){
+    if(String(onlyNotes[i].note).includes('rest')){
+      const element = document.getElementById(index);
+      element.style.backgroundColor = 'green'
+      index++;
+    }
+    else if(String(onlyNotes[i].note).includes('barline')){
+      continue;
+    }
+    else{
+      break;
+    }
+  }
+
   let buttonText = document.getElementById('live').textContent;
   if(buttonText !== 'Start'){
     lastItem = true
@@ -582,7 +599,7 @@ function autoCorrelate(buf, sampleRate) {
     rms += val * val
   }
   rms = Math.sqrt(rms / SIZE)
-  if (rms < 0.01)
+  if (rms < 0.03)
     // not enough signal
     return -1
 
@@ -630,6 +647,7 @@ function autoCorrelate(buf, sampleRate) {
 }
 
 function updatePitch(time) {
+  
   var cycles = new Array()
   analyser.getFloatTimeDomainData(buf)
   var ac = autoCorrelate(buf, audioContext.sampleRate)
@@ -675,6 +693,27 @@ function updatePitch(time) {
         octaveArr.push(prevNoteOctave)
         sampleCounters.push(sampleCounter)
         howManyArr.push(howMany)
+        if(index >= notesLength){
+         return 
+        }
+        let element = document.getElementById(index) 
+        if(prevNote+prevNoteOctave !== element.getAttribute('note'))
+          element.style.backgroundColor = 'red';
+        else{
+        element.style.backgroundColor = 'green';
+        }
+        index++;
+        for(let i=index;i<notesLength;i++){
+          element = document.getElementById(i)
+          if(element.src.includes('rest')){
+            element.style.backgroundColor = 'green';
+            index++;
+          }
+          else{
+            break;
+          }
+
+        }
         sampleCounter = 0
         prevNote = null;
         howMany = 0;
@@ -711,6 +750,7 @@ function updatePitch(time) {
       octaveArr.push(prevNoteOctave)
       sampleCounters.push(sampleCounter)
       howManyArr.push(howMany)
+      // index++;
     }
       
     if (prevNote == noteStrings[note % 12] && noteOctave > 1 && noteOctave < 6){ //|| notesArr == [] ){
