@@ -8,7 +8,7 @@
 <body>
 	<script type='text/javascript' src='./node_modules/tone/build/Tone.js'></script>
 	<script src="./midi.js" defer></script>
-</body>
+	<script src="server.js" defer> </script>
 <button onclick="playMidi()">play</button>
 <img id='outputimg' style="height:149px; width:833px;">
 <div class="center">
@@ -33,4 +33,47 @@
 	  </div>
 	</div>
   </div>
+  <div id="pitchDetect">
+	
+  <!-- <script type='text/javascript' src='./node_modules/tone/build/Tone.js'></script> -->
+	<!-- <script src="./node_modules/music-tempo/dist/browser/music-tempo.js"></script> -->
+  
+  <!-- <script src="../node_modules/midi-writer-js" defer></script> -->
+  <!-- <script src="midi.js" type="module"></script> -->
+	<script src="pitchdetect.js" defer></script>
+	<!-- <script src="midi.js"></script> -->
+  <!-- <button onclick="playMidi()">Hello</button> -->
+  <div class="gridItem">
+  <div class="center">
+	<div id="detector" class="vague">
+	  <!--HZ-->
+	  <div class="pitch">
+		<span id="pitch">--</span>
+		Hz
+	  </div>
+	  <div class="note"><span id="note">--</span></div>
+	  <canvas id="output" width="300" height="42"></canvas>
+	  <div id="detune">
+		<span id="detune_amt">--</span>
+		<span id="flat">cents &#9837;</span>
+		<span id="sharp">cents &#9839;</span>
+	  </div>
+	</div>
+  </div>
+  
+  
+  <div class="center">
+	<canvas id="waveform" width="512" height="256"></canvas>
+  </div>
+  <div class="center">
+	  <div id="buttons">
+		<button id="live" onclick="this.innerText = startPitchDetect();">Start</button>
+		<button onclick="this.innerText = togglePlayback()">use demo audio</button>
+		<button onclick="toggleLiveInput()">use live input</button>
+		<button onclick="toggleOscillator()">use oscillator</button>
+	  </div>
+	</div>
+</div>
+</div>
+</body>
 </html>

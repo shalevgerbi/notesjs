@@ -127,6 +127,7 @@ div.vague {
 canvas {
   margin: 15px;
 }
+
 #play-button {
   width: 60px;
   height: 60px;
@@ -196,5 +197,10 @@ input::file-selector-button {
   display: flex;
   border:none;
   padding: 10px 20px;
+}
+
+=======
+#pitchDetect {
+  padding-top: 100px
 }
 

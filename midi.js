@@ -12,6 +12,7 @@ const duration = {
     eighth: "8n",
     sixteenth: "16n"
 }
+let eighth_line_index = 0 ;
 const onlyNotes = [];
 const img = localStorage.getItem("image")
 const output = document.getElementById("outputimg")
@@ -22,7 +23,7 @@ function draw_isRotate(note){
     let res=true;
     if(octave == 4){
       regular4.map(label => {
-        if(note.includes(label)) res=false;
+        if(note.includes(label)) return false;
       })
     }
     else if(octave == 3){
@@ -32,10 +33,14 @@ function draw_isRotate(note){
   }
 function draw_getRhythm(numRhythm) {
     switch (numRhythm){
-        case 2:
-            return 'half/'
+        case 0.25:
+          return 'sixteen/'
 				case 0.5:
 						return 'eighth/'
+        case 2:
+            return 'half/'
+        case 4:
+            return 'whole/'
 				default:
             return 'quarter/'
       
@@ -63,6 +68,9 @@ function draw_pickSvg(note, numRhythm) {
       }
         return path + 'note.svg'
       }
+    else if(path.includes('whole')){
+      return path + 'note.svg'
+    }
     else {
       return path + 'note_Rotate.svg'
     }
@@ -80,8 +88,6 @@ const getrythm = (note) => {
     if (String(note).endsWith("sixteenth") || String(note).endsWith("thirty_second"))
         return rhythm.sixteenth;
     return rhythm.quarter;
-    
-    // return getrythm(note)
 }
 
 const getNote = (note) => {
@@ -145,17 +151,38 @@ const draw_noteToLocation = (note,getRotate) => {
       }
       location += 5
     })
-    if(note.note.includes("rest") && note.rhythm == 2){
-      finalLocation = 26
-    }
-    else if(note.note.includes("rest") && note.rhythm == 1){
-      finalLocation = 10
-    }
+    if(note.note.includes("rest")) {
+      switch(note.rhythm){
+        case 0.25:
+          finalLocation = 9
+          break;
+        case 0.5:
+          finalLocation = 9
+          break;
+        case 1:
+          finalLocation = 10
+          break;
+        case 2:
+          finalLocation = 26
+          break
+        default:
+      }
+     }
+     //   ToDO  //
+     console.log("onlyNotes.indexOf(note.note)",onlyNotes.indexOf(note))
+    if (note.rhythm === 0.5
+       && !note.note.includes("rest") 
+       && (eighth_line_index === 4 
+      || (eighth_line_index ===0  && (onlyNotes[onlyNotes.indexOf(note)+1].note.includes("barline") || onlyNotes[onlyNotes.indexOf(note)+1].rhythm > 0.5))
+      ))
+     finalLocation -=6
+    if (note.rhythm > 0.5)
+      eighth_line_index = 0
     return finalLocation
   }
 const drawNotes = () => {
     let distance = 50
-		let eighth_line_index = 0 ;
+		notesIndex = 0;
     onlyNotes.forEach((note,index) => {
         const divQuarter = document.getElementById('containerQuarterNoteGC')
         if(note.note.includes("barline")){
@@ -180,7 +207,8 @@ const drawNotes = () => {
       let quarter = document.createElement('img')
       let sharp = null
       let isRotate = draw_isRotate(note.note)
-			note.rhythm === 0.5? isRotate = false : null	
+      // console.log("isRotate:",isRotate,"note",note.note,)
+			// note.rhythm === 0.5? isRotate = false : null	
       const flag = isBemol(note.note);
       if (flag !== 'none') {
         sharp = document.createElement('img')
@@ -198,92 +226,258 @@ const drawNotes = () => {
       }
 			
       quarter.src = draw_pickSvg(note.note,note.rhythm)
+      quarter.id = notesIndex
+      const formatNote = formatNotes(note.note)
+      quarter.setAttribute('note',formatNote)
+      notesIndex++;
+      console.log(quarter.id)
 			
 			let quarterPlace =  draw_noteToLocation(note,isRotate)
+      console.log("quarterPlace",quarterPlace,"note: ",note)
       quarter.style.bottom = quarterPlace + 'px'
       quarter.style.position = 'absolute'
       // quarter.style.zIndex = -1
       quarter.style.left = distance + 'px'
       divQuarter.appendChild(quarter)
-			if(note.rhythm == 0.5){
-			let eight = document.createElement('img')
-			eighth_line_index++;
-			eighth_line_index < 4 ? eight.src = './img/staff/eightLine2.svg' : eight.src = ""
-			eight.style.position = 'absolute';
-
-			// }
-			if(eighth_line_index === 4 )
-					eighth_line_index = 0;
-			
-			if(quarterPlace && (index < onlyNotes.length-1 && onlyNotes[index+1].rhythm === 0.5)) {
-				quarter.src = './img/notes/quarter/note.svg'
-			let nextNote =  draw_noteToLocation(onlyNotes[index+1],isRotate)
-				console.log("nextNote",nextNote)
-				console.log("currentNote", quarterPlace)
-				// eight.style.zIndex = 999;
-				// eight.style.top = quarterPlace - 20 + 'px'
-				const rotate = getRotate(quarterPlace,nextNote)
-				eight.style.transform = `rotate(${rotate.rotate}deg)`;
-
-				eight.style.bottom = (rotate.bottom) + 'px'
-				
-				if(rotate.left){
-					eight.style.left = Number(distance) + 13 + rotate.left + 'px'
-				}
-				else
-					eight.style.left = Number(distance) + 13 + 'px'
-				if(rotate.width){
-					eight.style.width = rotate.width + 'px'
-				}
-				divQuarter.appendChild(eight)
-		}
-		if(index > 0 && onlyNotes[index-1].rhythm === 0.5)
-			quarter.src = './img/notes/quarter/note.svg'
-	}
-  if(note.note.includes('.')) {
-    const dotSvg = document.createElement('img');
-    dotSvg.src = './img/flags/dot.svg';
-    dotSvg.style.position = 'absolute';
-    dotSvg.style.height = '15px'
-    dotSvg.style.width = '5px'
-    let dotPlace = 50;
-    !isRotate ? dotPlace-= 46 : dotPlace -=12;
-    let leftPlace = 20
-    quarter.src.includes('eighth') ? leftPlace+=10 : null 
-    console.log(isRotate,"isRotate")
-    console.log(dotPlace,"dotPlace")
-    dotSvg.style.left = Number(distance) + leftPlace + 'px'
-    dotSvg.style.bottom = Number(quarterPlace) + dotPlace + 'px'
-    divQuarter.appendChild(dotSvg);
-  }
+      if(quarterPlace > 22){
+        const line = document.createElement('img');
+        line.src = '/img/staff/line.svg';
+        line.style.position = 'absolute';
+        line.style.left = distance - 3 + 'px'
+        line.style.bottom = 56 + 'px'
+        line.style.zIndex = -1
+        divQuarter.appendChild(line)
+      }
+      const isSvgChanged = createEightLine(note,index,quarterPlace,isRotate,quarter,distance,divQuarter)
+      if(note.rhythm === 0.25)
+        createEightLine(note,index,quarterPlace,isRotate,quarter,distance,divQuarter,true)
+      
+      if(note.note.includes('.')) {
+        const dotSvg = document.createElement('img');
+        dotSvg.src = './img/flags/dot.svg';
+        dotSvg.style.position = 'absolute';
+        dotSvg.style.height = '15px'
+        dotSvg.style.width = '5px'
+        let dotPlace = 50;
+        !isRotate ? dotPlace-= 46 : dotPlace -=12;
+        let leftPlace = 20
+        quarter.src.includes('eighth') ? leftPlace+=10 : null 
+        console.log(isRotate,"isRotate")
+        console.log(dotPlace,"dotPlace")
+        dotSvg.style.left = Number(distance) + leftPlace + 'px'
+        dotSvg.style.bottom = Number(quarterPlace) + dotPlace + 'px'
+        divQuarter.appendChild(dotSvg);
+      }
       distance += 50
 })
+    localStorage.setItem('notesLength',notesIndex)
     sampleCounter = 0
     howMany=0
-		
-        // let path = draw_pickSvg(note.note, note.rhythm)
-        // console.log(path)
 };
-const getRotate = (current,next) => {
-	let sum = (Number(current) - Number(next)) / -50
-	console.log(sum)
-	switch(sum){
+function formatNotes(note) {
+  if(!note.includes('b'))
+    return note;
+  note = note.replace('b','#')
+  const regular = ['A','B','C','D','E','F','G']
+  noteChar = note[0]
+  let index
+  if(regular.includes(noteChar)) {
+    index = regular.indexOf(noteChar)
+    if(index === 0){
+      index = regular.length - 1
+    }
+    else{
+      index--;
+    }
+    note = note.replace(noteChar,regular[index])
+  }
+  return note
+}
+const createEightLine = (note,index,quarterPlace,isRotate,quarter,distance,divQuarter,isSecond=false) => {
+  if(note.rhythm <= 0.5){
+    let eight = document.createElement('img')
+    let sixteen;
+    let svgCahnged= false;
+    if(eighth_line_index === 4 && !isSecond)
+      eighth_line_index = 0
+    !isSecond ? eighth_line_index++ : null;
+    if(eighth_line_index < 4 && 
+      onlyNotes[index+1] 
+      &&
+      (
+        !String(onlyNotes[index+1].note).includes("rest") 
+        && (!String(onlyNotes[index+1].note).includes("barline"))
+       && onlyNotes[index+1].rhythm <= 0.5
+      )
+         && (!isSecond || eighth_line_index )
+      
+      ){
+      eight.src = './img/staff/eightLine2.svg'
+      
+    } 
+    else {
+      eight.src = ""
+
+    }
+    if(((onlyNotes[index].note.includes("rest") 
+    )  && eighth_line_index === 3
+    ))
+    eighth_line_index = 1
+    eight.style.position = 'absolute';
+    console.log("eighth_line_index",eighth_line_index)
+    // }
+    // if(eighth_line_index === 4 && !String(onlyNotes[index+1].note).includes("rest")){
+    //     eighth_line_index = 0;
+    // }
+    // console.log(!onlyNotes[index+1].note.includes("rest"))
+    if(quarterPlace && (
+      (!String(onlyNotes[index].note).includes("rest") && (!String(onlyNotes[index+1].note).includes("barline") || eighth_line_index === 4) && onlyNotes[index+1].rhythm <= 0.5 )
+      || eighth_line_index === -1
+      || (String(onlyNotes[index+1].note).includes("barline") && eighth_line_index === 4)
+      )) {
+      svgCahnged = true
+      let rotation;
+      let nextNote =  draw_noteToLocation(onlyNotes[index+1],isRotate)
+      // if(eighth_line_index === 1) 
+      rotation = checkRotation(onlyNotes,index,eighth_line_index)
+      let rotate;
+      // console.log("quarterPlace",quarterPlace,"nextNote",nextNote)
+      if(eighth_line_index === 1 && String(onlyNotes[index+1].note).includes("barline"))
+        return
+      if(isSecond)
+        rotate = getRotate(Number(quarterPlace),Number(nextNote),rotation,isSecond)
+      else rotate = getRotate(Number(quarterPlace),Number(nextNote),rotation,isSecond)
+      if(rotation){
+        quarter.src = './img/notes/quarter/note_Rotate.svg'
+        
+      }
+      else{
+        quarter.src = './img/notes/quarter/note.svg'
+        
+      }
+      eight.style.bottom = (rotate.bottom) + 'px'
+      console.log("nextNote",nextNote)
+      console.log("currentNote", quarterPlace)
+      // eight.style.zIndex = 999;
+      // eight.style.top = quarterPlace - 20 + 'px'
+      // const rotate = getRotate(quarterPlace,nextNote)
+      console.log(rotate,"rotate")
+      eight.style.transform = `rotate(${rotate.rotate}deg)`;
+    
+      eight.style.bottom = (rotate.bottom) + 'px'
+      
+      if(rotate.left){
+        eight.style.left = Number(distance) + 13 + rotate.left + 'px'
+      }
+      else
+        eight.style.left = Number(distance) + 13 + 'px'
+      if(rotate.width){
+        eight.style.width = rotate.width + 'px'
+      }
+      divQuarter.appendChild(eight)
+      return svgCahnged
+  }
+  if(eighth_line_index === -1)
+    eighth_line_index++;
+}
+}
+
+const checkRotation = (allNotes,index,rollPlace) => {
+  const current = allNotes[index]
+  console.log("current",current)
+  rollPlace === 0 ? rollPlace = 4 : null
+  for(let i=index+1; i< index+2 - rollPlace; i++){
+    
+      if(allNotes[i].rhythm !== 0.5 
+        // && rollPlace % 2 !== 0
+        )
+        return false;
+      
+      if(!draw_isRotate(allNotes[i].note))
+        return false;
+  }
+  return true
+}
+const getRotate = (current,next,rotation,isSecond=false) => {
+	let sum , bottomSum=0, twoWidth;
+  sum= Number(((Number(current) - Number(next)) / -50).toFixed(1))
+  // isSecond ? sum= (Number(current) - Number(next)) / -10 : null
+	// console.log("sum",sum)
+  !rotation ? rotation = 0 : rotation =47;
+  let leftRotate =  !rotation ? 0 : -12;
+  // const bottomRotate = !rotation ? 0 : -13;
+  if (rotation !== 0) {
+    // console.log("sum",(sum * 10) / 10)
+    console.log('sum.toFixed() before',sum)
+    switch(Number(sum)){
+      case -0.5:
+        rotation -=46;
+        break;
+      case -0.4:
+        rotation -=43
+        twoWidth = -2
+        leftRotate +=11
+        break;
+      case -0.2:
+        rotation -= 47 
+        leftRotate -=1
+        twoWidth = -1
+        break;
+      case -0.1:
+        rotation -= 20;
+        leftRotate -= 1
+        break;
+      case 0:
+        rotation -= 5;
+        leftRotate -= 1
+        break;
+      case 0.1:
+        rotation -= 46; 
+        leftRotate -= 1  
+        break;
+      case 0.2:
+        rotation -= 47
+        leftRotate -= 1 
+        break
+      case 0.4:
+        break;
+      case 0.5:
+        rotation -=46
+        twoWidth = 2
+        leftRotate +=2
+      // default:
+      //   rotation -=0
+      // break;
+  }
+}
+isSecond ?  rotation -= 7 : null
+sum === 0.5 && isSecond ? rotation -=2 : null;
+console.log("sum.toFixed()",sum)
+	switch(Number(sum)){
+    case -0.5:
+      return {rotate: 23, bottom: Number(current) -10.5 - rotation,left: -14,width:55}
 		case -0.4:
-			return {rotate: 20, bottom: (Number(current) - Number(next)) + 20 - Math.abs(sum+4) }
+			return {rotate: 19, bottom: Number(current) - 10 - rotation, left:-14 - leftRotate,width: 55 + twoWidth}
 		case -0.3:
-			return {rotate: 14, bottom: (Number(current) - Number(next)) + 33.5 - Math.abs(sum+4), width: 53 }
+			return {rotate: 14, bottom: Math.abs(Number(current) - Number(next)).toPrecision(2) + 33.5 - Math.abs(sum+4) - rotation, width: 53 }
+		case -0.2:
+			return {rotate: 7, bottom: Number(current) - 7 - rotation ,left: leftRotate, width: 53 + twoWidth}
 		case -0.1:
-			return {rotate: 5, bottom: (Number(current) - Number(next)) + 50 - Math.abs(sum+4) }
+			return {rotate: 5, bottom: Number(current) + 21 - rotation - bottomSum ,left:leftRotate}
 		case 0:
-			return {rotate: sum, bottom: (Number(current) - Number(next)) + 50 - Math.abs(sum) }	
+			return {rotate: sum, bottom:Number(current) + 40 - rotation, left:leftRotate }	
 		case 0.1:
-			return {rotate: -5, bottom: (Number(current) + Number(next)) + 27 - Math.abs(sum+4) }
+			return {rotate: -5, bottom:Number(current) - rotation ,left:leftRotate}
 		case 0.2:
-			return {rotate: -10,bottom: (Number(current) + Number(next)) + 23 - Math.abs(sum +4)}
+			return {rotate: -10,bottom:Number(current) + 3 - rotation ,left: leftRotate}
 		case 0.4:
-			return {rotate: -22,bottom: (Number(current) + Number(next)) + 32 - Math.abs(sum +4), left: -3, width: +55}	
+			return {rotate: -18,bottom: Number(current) + 55 - rotation, left: -3 + leftRotate, width: +55 }	
+    case 0.5:
+      return {rotate: -30,bottom: Number(current) + 11 - rotation, left: -8 + leftRotate, width: 61 - twoWidth }
+    case 0.6: 
+      return {rotate: -30, bottom: Number(current) + 54 - rotation, left: -4 + leftRotate, width: 100 - twoWidth }
 		default:
-			return {rotate: -5,bottom: (Number(current) + Number(next)) + 33 - Math.abs(sum +4)}	
+			return {rotate: -5,bottom: Number(current) - rotation, left:leftRotate}	
 	}
 }
 const createNotes = () => {
@@ -331,6 +525,7 @@ Tone.loaded().then(() => {
 						console.log(childrens[index])
 					})
 					sampler.triggerAttackRelease(note.note, note.duration,now+time)
+          console.log(note.note)
         }
         time+=note.rhythm
     })
