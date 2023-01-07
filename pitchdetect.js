@@ -44,6 +44,8 @@ var songBeats;
 var amountContainerQuarter = 1
 var currentContainerQuarter = null
 
+let iconBpm;
+
 var noteStrings = [
   'C',
   'C#',
@@ -104,6 +106,8 @@ window.onload = function () {
   
   detectorElem = document.getElementById('detector')
   DEBUGCANVAS = document.getElementById('waveform')
+  iconBpm = document.getElementById('icon-play-pause');
+
   
   if (DEBUGCANVAS) {
     waveCanvas = DEBUGCANVAS.getContext('2d')
@@ -936,4 +940,24 @@ function arrayMax(arr) {
     }
   }
   return max;
+}
+let isPlay= false;
+let audioBpm = new Audio('./audio/bpm.wav');
+let nIntervId;
+function togglePlay(){
+  if(!isPlay){
+    isPlay=true;
+    iconBpm.className='fa fa-pause';
+    if(!nIntervId){
+      nIntervId = setInterval(()=>{
+        audioBpm.play()
+      }, 500);
+  }
+  }else{
+    isPlay=false;
+    iconBpm.className='fa fa-play';
+    audioBpm.pause();
+    clearInterval(nIntervId);
+    nIntervId = null;
+  }
 }
