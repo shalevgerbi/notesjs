@@ -182,7 +182,7 @@ const draw_noteToLocation = (note,getRotate) => {
   }
 const drawNotes = () => {
     let distance = 50
-		
+		notesIndex = 0;
     onlyNotes.forEach((note,index) => {
         const divQuarter = document.getElementById('containerQuarterNoteGC')
         if(note.note.includes("barline")){
@@ -226,6 +226,11 @@ const drawNotes = () => {
       }
 			
       quarter.src = draw_pickSvg(note.note,note.rhythm)
+      quarter.id = notesIndex
+      const formatNote = formatNotes(note.note)
+      quarter.setAttribute('note',formatNote)
+      notesIndex++;
+      console.log(quarter.id)
 			
 			let quarterPlace =  draw_noteToLocation(note,isRotate)
       console.log("quarterPlace",quarterPlace,"note: ",note)
@@ -265,9 +270,29 @@ const drawNotes = () => {
       }
       distance += 50
 })
+    localStorage.setItem('notesLength',notesIndex)
     sampleCounter = 0
     howMany=0
 };
+function formatNotes(note) {
+  if(!note.includes('b'))
+    return note;
+  note = note.replace('b','#')
+  const regular = ['A','B','C','D','E','F','G']
+  noteChar = note[0]
+  let index
+  if(regular.includes(noteChar)) {
+    index = regular.indexOf(noteChar)
+    if(index === 0){
+      index = regular.length - 1
+    }
+    else{
+      index--;
+    }
+    note = note.replace(noteChar,regular[index])
+  }
+  return note
+}
 const createEightLine = (note,index,quarterPlace,isRotate,quarter,distance,divQuarter,isSecond=false) => {
   if(note.rhythm <= 0.5){
     let eight = document.createElement('img')
@@ -500,6 +525,7 @@ Tone.loaded().then(() => {
 						console.log(childrens[index])
 					})
 					sampler.triggerAttackRelease(note.note, note.duration,now+time)
+          console.log(note.note)
         }
         time+=note.rhythm
     })
